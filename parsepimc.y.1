@@ -1,0 +1,121 @@
+%{
+#include <cstdio>
+#include <iostream>
+//#include <ppl.hh>
+#include "State.h"
+#include "Pimc.h"
+using namespace std;
+//using namespace Parma_Polyhedra_Library::IO_Operators;
+
+// stuff from flex that bison needs to know about:
+extern "C" int yylex();
+extern "C" int yyparse();
+extern "C" FILE *yyin;
+
+void yyerror(Pimc *pimc, const char *s);
+int yyparse(Pimc *pimc);
+%}
+
+%parse-param{Pimc *pimc}
+
+// Bison fundamentally works by asking flex to get the next token, which it
+// returns as an object of type "yystype".  But tokens could be of any
+// arbitrary data type!  So we deal with that in Bison by defining a C union
+// holding each of the types of tokens that Flex could return, and have Bison
+// use that union instead of "int" for the definition of "yystype":
+%union {
+	int ival;
+	float fval;
+	char *sval;
+}
+
+// define the constant-string tokens:
+%token PIMC NSTATE WITH ARROW
+%token END
+
+// define the "terminal symbol" token types I'm going to use (in CAPS
+// by convention), and associate each with a field of the union:
+%token <ival> INT
+%token <fval> FLOAT
+%token <sval> STRING
+
+%%
+
+// the first rule defined is the highest-level rule, which in our
+// case is just the concept of a whole "snazzle file":
+
+end_parsing:
+	header nstates body_section footer { cout << "Done with the pIMC file!" << endl; }
+	;
+header:
+	PIMC FLOAT { cout << "pIMC file version " << $2 << endl;}
+	;
+nstates: // We first create n empty states for the initial pIMC
+	INT {  
+                pimc->createState();
+                pimc->printStates();
+            }
+	;
+body_section:
+	body_lines
+	;
+body_lines:
+	body_line body_lines
+	| body_line
+	;
+body_line: // We then create for every State its list of successors (succ) with probabilities (prob) contained in Interval
+	INT ARROW INT WITH FLOAT FLOAT { cout << "New state: " << $1 << endl;
+                               /*State *state;
+                               state = new State();
+                               state->setId($1);
+                               pimc->addState(*state);
+                               pimc->printStates();*/
+                            }
+	;
+footer:
+	END
+	;
+
+%%
+
+int main(int, char**) {
+        
+        Pimc *pimc;
+        
+        Pimc p;
+	// open a file handle to a particular file:
+	FILE *myfile = fopen("in.pimc", "r");
+	// make sure it's valid:
+	if (!myfile) {
+		cout << "I can't open in.pimc!" << endl;
+		return -1;
+	}
+	// set flex to read from it instead of defaulting to STDIN:
+	yyin = myfile;
+
+	// parse through the input until there is no more:
+	do {
+		yyparse(pimc);
+	} while (!feof(yyin));
+        
+         p.createState();
+         p.printStates();
+        
+        
+        /*Variable x(0);
+        Variable y(1);
+        
+        Grid_Generator_System gs;
+        gs.insert(grid_point(0*x+0*y));
+        gs.insert(parameter(3*x+0*y));
+        gs.insert(parameter(0*x+3*y));
+        */
+        
+        
+}
+
+void yyerror(Pimc *pimc, const char *s) {
+	cout << "EEK, parse error!  Message: " << s << endl;
+	// might as well halt now:
+	exit(-1);
+}

@@ -1,0 +1,12 @@
+pIMC
+a -> c with 0.1 1.0
+a -> b with 0.2 0.9 
+c -> a with 0.4 1.0
+g -> c with 0.3 0.9
+g -> u with 0.0 0.9
+g -> i with 0.1 0.9
+i -> b with 0.7 0.4
+u -> c with 0.8 0.9
+end
+
+

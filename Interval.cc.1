@@ -1,0 +1,82 @@
+/* 
+ * File:   Interval.cc
+ * Author: florent
+ * 
+ * Created on 25 novembre 2015, 13:48
+ */
+
+#include <iostream>
+#include <string>
+#include "Interval.h"
+
+using namespace std;
+
+Interval::Interval(string f, string s) {
+    this->fstr = f;
+    this->sstr = s;
+    this->fflt = -1; // valeur pour signifier que l'attribut est non utilisé
+    this->sflt = -1; // valeur pour signifier que l'attribut est non utilisé
+}
+Interval::Interval(float f, float s) {
+    this->fflt = f;
+    this->sflt = s;
+    this->fstr = ""; // valeur pour signifier que l'attribut est non utilisé
+    this->sstr = ""; // valeur pour signifier que l'attribut est non utilisé
+}
+Interval::Interval(float f, string s) {
+    this->fflt = f;
+    this->sstr = s;
+    this->fstr = ""; // valeur pour signifier que l'attribut est non utilisé
+    this->sflt = -1; // valeur pour signifier que l'attribut est non utilisé
+}
+Interval::Interval(string f, float s) {
+    this->fstr = f;
+    this->sflt = s;
+    this->fflt = -1; // valeur pour signifier que l'attribut est non utilisé
+    this->sstr = ""; // valeur pour signifier que l'attribut est non utilisé
+}
+
+Interval::Interval(const Interval& orig) {
+}
+
+Interval::~Interval() {
+}
+
+void Interval::setFstr(string str) {
+    this->fstr = str;
+    this->fflt = -1;
+}
+void Interval::setSstr(string str) {
+    this->sstr = str;
+    this->sflt = -1;
+}
+
+void Interval::setFflt(float flt) {
+    this->fflt = flt;
+    this->fstr = "";
+}
+void Interval::setSflt(float flt) {
+    this->sflt = flt;
+    this->sstr = "";
+}
+
+float Interval::getFflt() {
+    return this->fflt;
+}
+float Interval::getSflt() {
+    return this->sflt;
+}
+string Interval::getFstr() {
+    return this->fstr;
+}
+string Interval::getSstr() {
+    return this->fstr;
+}
+
+void Interval::printIntval() {
+    cout << "[";
+    if(fflt==-1) { cout <<  fstr; } else { cout << fflt; }
+    cout << ";";
+    if(sflt==-1) { cout <<  sstr; } else { cout << sflt; }
+    cout << "]";
+}
